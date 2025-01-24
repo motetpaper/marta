@@ -1,20 +1,17 @@
 // Code.gs
+// v0.1
 
-// create add-on menu
 function onOpen() {
   SpreadsheetApp.getUi()
-    .createMenu('Download as Markdown')
-    .addItem('Download as Markdown text file', 'getMartaObject')
+    .createMenu('Download as Markdown text file')
+    .addItem('Download the active range ...', 'getMartaObject')
     .addToUi();
 }
 
-// yes.
 function onInstall() {
   onOpen();
 }
 
-// get the marta object (custom google sheets map)
-// process the map into markdown text
 function getMartaObject() {
   const marta = JSON.stringify(mkmarta());
   // working marta client-side handoff prototype
@@ -23,14 +20,16 @@ function getMartaObject() {
   <!doctype html>
   <html>
   <head></head>
-  <body><script defer type="text/javascript">
+  <body>
+  <h1>Thank you for using MOTET PAPER.</h1>
+  <script defer type="text/javascript">
   document.body.onload = () => {
     marta(${marta});
   }
   function marta(obj) {
     const sheet = obj;
     const now = Date.now();
-    const outfile = sheet.name+'-'+now+'.md.txt';
+    const outfile = sheet.name+'-'+now+'.markdown.txt';
     let thetable = sheet.dvals.map((a)=>{
       return a.map((str)=>{
         return '| ' + str + ' ';
@@ -214,4 +213,9 @@ function mkmarta() {
   });
 
   return obj;
+}
+
+
+function debug_tostring(obj) {
+  Logger.log(JSON.stringify(obj));
 }
