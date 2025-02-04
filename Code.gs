@@ -1,109 +1,6 @@
 // Code.gs
 // v0.1
 
-function onOpen() {
-  SpreadsheetApp.getUi()
-    .createMenu('Download as Markdown text file')
-    .addItem('Download the active range ...', 'getMartaObject')
-    .addToUi();
-}
-
-function onInstall() {
-  onOpen();
-}
-
-function getMartaObject() {
-  const marta = JSON.stringify(mkmarta());
-  // working marta client-side handoff prototype
-  const ui =  SpreadsheetApp.getUi();
-  const html = HtmlService.createHtmlOutput(`
-  <!doctype html>
-  <html>
-  <head></head>
-  <body>
-  <h1>Thank you for using MOTET PAPER.</h1>
-  <script defer type="text/javascript">
-  document.body.onload = () => {
-    marta(${marta});
-  }
-  function marta(obj) {
-    const sheet = obj;
-    const now = Date.now();
-    const outfile = sheet.name+'-'+now+'.markdown.txt';
-    let thetable = sheet.dvals.map((a)=>{
-      return a.map((str)=>{
-        return '| ' + str + ' ';
-      });
-    });
-
-    console.table(thetable)
-
-    // removes the hidden rows
-    thetable = thetable.map((a,i)=> {
-      return a.filter((b,j)=>{
-        return !sheet.hidecols[j][1];
-      });
-    });    
-
-    // removes hidden rows
-    thetable = thetable.filter((a,i)=>{
-        return !sheet.hiderows[i][1];
-    });
-
-    const alignRow = thetable[0].map((a,i)=>{
-      return getAlignRow(sheet.aligns[0][i]);
-    });
-
-    console.log(alignRow);
-    // adds alignments to the markdown table
-    thetable.splice(1,0,alignRow);
-
-    
-    const outdata = thetable.map((a)=>a.join('')+'|').join('\\n')+'\\n'
-    const blob = new Blob([outdata], {
-      type: 'text/plain'
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = outfile;
-    a.click();
-
-    // function ..
-    
-
-    // returns column alignment in markdown syntax
-    function getAlignmentMarkdown(str) {
-      switch(str.toLowerCase()) {
-      case 'left':
-      case 'general-left':
-        return ':--'
-      case 'left':
-      case 'general-left':
-        return ':--'
-      case 'left':
-      case 'general-left':
-        return ':--'
-      default:
-        return ':--:';
-      }
-    }
-
-    // returns alignment in markdown syntax
-    function getAlignRow(str) {
-      const align = getAlignmentMarkdown(str);
-      return '| ' + align + ' ';
-    }    
-  }
-  </script>
-  </body>
-  </html>
-  `);
-  ui.showSidebar(html);
-}
-
-
-
 function mkmarta() {
 
   const obj = {};
@@ -213,9 +110,4 @@ function mkmarta() {
   });
 
   return obj;
-}
-
-
-function debug_tostring(obj) {
-  Logger.log(JSON.stringify(obj));
 }
